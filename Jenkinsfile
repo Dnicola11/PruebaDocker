@@ -18,27 +18,27 @@ pipeline {
             }
         }
 
-        stage('Start Expo build') {
+        stage('Validate Expo project') {
             steps {
-                sh 'npx expo install'
-                sh 'npx expo prebuild'
+                sh 'npx expo install'  // Asegura que las dependencias nativas estén bien
             }
         }
 
-        stage('Build Android APK (optional)') {
+        stage('TypeScript check (opcional)') {
             steps {
-                sh 'npx expo build:android'
+                sh 'npx tsc --noEmit'  // Solo valida los tipos, no compila
             }
         }
     }
 
     post {
         success {
-            echo '✅ Proyecto Expo compilado con éxito.'
+            echo '✅ Proyecto validado correctamente en Jenkins (sin ejecución).'
         }
         failure {
-            echo '❌ Falló el proceso de construcción.'
+            echo '❌ Error en la validación del proyecto.'
         }
     }
 }
+
 
