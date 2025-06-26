@@ -1,39 +1,44 @@
 pipeline {
     agent any
-    
-    tools {
-       maven 'Maven Apache'
+
+    environment {
+        NODE_ENV = 'development'
     }
+
     stages {
         stage('Checkout') {
             steps {
-                // Clonar el repositorio desde GitHub
                 git url: 'https://github.com/Dnicola11/PruebaDocker.git', branch: 'main'
             }
         }
-        stage('Build') {
+
+        stage('Install dependencies') {
             steps {
-                // Compilar el proyecto usando Maven
-                script {
-                // Instalar Maven si no está disponible
-                    if (!isUnix()) {
-                        bat 'mvn -version || echo Maven is not installed'
-                    } else {
-                        sh 'mvn -version || echo Maven is not installed'
-                    }                    
-                }
-                
-                // Compilar proyecto
-                sh 'mvn clean install'
+                sh 'npm install'
+            }
+        }
+
+        stage('Start Expo build') {
+            steps {
+                sh 'npx expo install'
+                sh 'npx expo prebuild'
+            }
+        }
+
+        stage('Build Android APK (optional)') {
+            steps {
+                sh 'npx expo build:android'
             }
         }
     }
+
     post {
         success {
-            echo 'Build completed successfully!'
+            echo '✅ Proyecto Expo compilado con éxito.'
         }
         failure {
-            echo 'Build failed.'
+            echo '❌ Falló el proceso de construcción.'
         }
     }
 }
+
